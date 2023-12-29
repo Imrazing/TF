@@ -1,21 +1,28 @@
 from fastembed.embedding import FlagEmbedding as Embedding
 from typing import List
 from decimal import Decimal
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, g
 
 def create_app():
     app = Flask(__name__)
 
-    # Move the instantiation of embedding_model outside the route handler
+    # Define the model loading function
+    def load_embedding_model():
+        return Embedding(model_name="BAAI/bge-base-en", max_length=512)
+
+    # Use before_request to load the model before each request
+    @app.before_request
+    def before_request():
+        g.embedding_model = load_embedding_model()
 
     @app.route('/embedding', methods=['POST'])
     def get_embedding_route():
         try:
             data = request.json
             text = data.get('text', 'Guest')
-            embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
-            # Get embeddings
-            embeddings = get_embedding([text], embedding_model)
+
+            # Get embeddings using the model from the application context
+            embeddings = get_embedding([text], g.embedding_model)
 
             # Convert Decimal embeddings to string for JSON serialization
             str_embeddings = [str(embed) for embed in embeddings]
@@ -24,7 +31,7 @@ def create_app():
             return jsonify(result=str_embeddings)
 
         except Exception as e:
-            return jsonify(error=str(e)), 400  # Return a JSON response with error message and status code 400 for bad request
+            return jsonify(error=str(e)), 400
 
     return app
 
