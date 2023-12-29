@@ -9,6 +9,7 @@ COPY . /app
 
 # Install TensorFlow and other needed packages
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install gunicorn
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
@@ -17,4 +18,5 @@ EXPOSE 5000
 ENV TFHUB_CACHE_DIR=/app/tfhub_cache
 
 # Run the application
-CMD ["python", "run.py"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
+
