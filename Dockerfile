@@ -18,5 +18,5 @@ EXPOSE 5000
 ENV TFHUB_CACHE_DIR=/app/tfhub_cache
 
 # Run the application
-CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5000", "--worker-class", "gevent", "run:app"]
+CMD ["gunicorn", "-w", "4", "--bind", "0.0.0.0:5000", "--worker-class", "gthread", "run:app"]
 
