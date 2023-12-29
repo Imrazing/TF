@@ -1,10 +1,11 @@
+from gunicorn.workers.gthread import GThreadWorker
 from fastembed.embedding import FlagEmbedding as Embedding
-from typing import List
-from decimal import Decimal
 from flask import Flask, request, jsonify
+import gevent
 
-# Load the model at startup
-embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
+def on_worker_init(worker):
+    # Load the model for each worker
+    worker.embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
 
 def create_app():
     app = Flask(__name__)
@@ -15,8 +16,8 @@ def create_app():
             data = request.json
             text = data.get('text', 'Guest')
 
-            # Get embeddings using the pre-loaded model
-            embeddings = get_embedding([text], embedding_model)
+            # Get embeddings using the model from the worker
+            embeddings = get_embedding([text], g.worker.embedding_model)
 
             # Convert Decimal embeddings to string for JSON serialization
             str_embeddings = [str(embed) for embed in embeddings]
@@ -29,8 +30,11 @@ def create_app():
 
     return app
 
-def get_embedding(documents: List[str], embedding_model) -> List[Decimal]:
+def get_embedding(documents, embedding_model):
     try:
+        # Simulate some processing time to show the benefits of async workers
+        gevent.sleep(0.1)
+
         # Get embeddings for the documents
         embeddings = list(embedding_model.embed(documents))
 
