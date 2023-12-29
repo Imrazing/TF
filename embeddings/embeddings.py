@@ -1,40 +1,50 @@
 # embeddings.py
+from fastembed.embedding import FlagEmbedding as Embedding
+from typing import List
 from decimal import Decimal
-from flask import Flask,request
 import numpy as np
-import tensorflow_hub as hub
-import os
-import tempfile
+from flask import Flask, request, jsonify  # Import jsonify for converting to JSON
 
 def create_app():
     app = Flask(__name__)
     # Create a temporary directory for the TensorFlow Hub cache
-    hub_cache_path = os.path.join(tempfile.gettempdir(), "tfhub_cache")
-    os.makedirs(hub_cache_path, exist_ok=True)
-
-    # Set the TFHUB_CACHE_DIR environment variable
-    os.environ["TFHUB_CACHE_DIR"] = hub_cache_path
-
-    # Load the model
-    embed_model = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
-
 
     @app.route('/embedding', methods=['POST'])
     def hello_world():
         data = request.json  # Assuming the data is in JSON format
-        text = data.get('text', 'Guest')  # Retrieve 'name' from the JSON data, default to 'Guest' if not present
-        return get_embeddingTensorF(text,embed_model)
+        text = data.get('text', 'Guest')  # Retrieve 'text' from the JSON data, default to 'Guest' if not present
+        embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
+
+        # Get embeddings
+        embeddings = get_embedding([text],embedding_model)
+
+        # Convert Decimal embeddings to string for JSON serialization
+        str_embeddings = [str(embed) for embed in embeddings]
+
+        # Return the result as JSON
+        return embeddings
 
     return app
 
-
-def get_embeddingTensorF(text,embed_model):
+def get_embedding(documents: List[str],embedding_model) -> List[Decimal]:
     """
-    Returns the embedding for a given topic using the Universal Sentence Encoder.
-    """
-    embedding_list = float_to_decimal(embed_model([text])[0].numpy().tolist())       
-    return embedding_list
+    Get embeddings for a list of documents using the fastembed library.
 
+    Parameters:
+    - documents (List[str]): A list of documents.
+
+    Returns:
+    - List[Decimal]: A list of decimal representations of embeddings corresponding to the input documents.
+    """
+    # Create an instance of the Embedding model
+
+    # Get embeddings for the documents
+    embeddings = list(embedding_model.embed(documents))
+    print(type(embeddings))
+    # Convert embeddings to decimal representation
+
+    result = float_to_decimal(embeddings[0].tolist())
+    return result
 
 def float_to_decimal(obj):
     if isinstance(obj, float):
