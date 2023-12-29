@@ -7,14 +7,13 @@ def create_app():
     app = Flask(__name__)
 
     # Move the instantiation of embedding_model outside the route handler
-    embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
 
     @app.route('/embedding', methods=['POST'])
     def get_embedding_route():
         try:
             data = request.json
             text = data.get('text', 'Guest')
-
+            embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
             # Get embeddings
             embeddings = get_embedding([text], embedding_model)
 

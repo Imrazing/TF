@@ -4,7 +4,6 @@ FROM python:3.10.9
 # Set the working directory to /app
 WORKDIR /app
 
-RUN mkdir -p /tmp/fastembed_cache/ && chmod 777 /tmp/fastembed_cache/
 # Copy the current directory contents into the container at /app
 COPY . /app
 
@@ -19,5 +18,5 @@ EXPOSE 5000
 ENV TFHUB_CACHE_DIR=/app/tfhub_cache
 
 # Run the application
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:5000", "run:app"]
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
 
