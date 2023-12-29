@@ -20,4 +20,4 @@ ENV TFHUB_CACHE_DIR=/app/tfhub_cache
 
 # Run the application
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "run:app"]
-git 
+
