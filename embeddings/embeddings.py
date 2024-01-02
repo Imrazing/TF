@@ -41,6 +41,9 @@ def get_embedding(documents: List[str], embedding_model) -> List[Decimal]:
 
         # Convert embeddings to decimal representation
         result = float_to_decimal(embeddings[0])
+        print(f"Texto: {str(embeddings[0])}")
+        print(f"Dimensions of the result: {np.array(result).shape}")
+
         return result
 
     except Exception as e:
