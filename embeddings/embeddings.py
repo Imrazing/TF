@@ -4,7 +4,7 @@ from decimal import Decimal
 from flask import Flask, request, jsonify
 
 # Load the model at startup
-embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=512)
+embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=768)
 
 def create_app():
     app = Flask(__name__)
