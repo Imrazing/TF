@@ -34,6 +34,23 @@ def get_embedding(documents: List[str], embedding_model) -> List[Decimal]:
         # Get embeddings for the documents
         embeddings = list(embedding_model.embed(documents))
 
+        # Ensure the embeddings have the correct dimensionality (768)
+        if len(embeddings) > 0 and len(embeddings[0]) == 512:
+            # Pad the embeddings with zeros to adjust the dimensionality to 768
+            embeddings[0] = embeddings[0].tolist() + [0.0] * (768 - 512)
+
+        # Convert embeddings to decimal representation
+        result = float_to_decimal(embeddings[0])
+        return result
+
+    except Exception as e:
+        raise RuntimeError(f"Error in embedding process: {str(e)}")
+
+def get_embedding0(documents: List[str], embedding_model) -> List[Decimal]:
+    try:
+        # Get embeddings for the documents
+        embeddings = list(embedding_model.embed(documents))
+
         # Convert embeddings to decimal representation
         result = float_to_decimal(embeddings[0].tolist())
         return result
