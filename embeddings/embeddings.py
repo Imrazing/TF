@@ -2,6 +2,7 @@ from fastembed.embedding import FlagEmbedding as Embedding
 from typing import List
 from decimal import Decimal
 from flask import Flask, request, jsonify
+import numpy as np  # Import NumPy for array operations
 
 # Load the model at startup
 embedding_model = Embedding(model_name="BAAI/bge-base-en", max_length=768)
